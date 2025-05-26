@@ -19,7 +19,7 @@ class Article:
             self._title = title
         else:
             raise ValueError("Title must be a non empty string less than 50")
-        
+    #Save article instance into table   
     def save(self):
         if self.id:
             CURSOR.execute("UPDATE articles SET title = ?, author_id = ?, magazine_id = ? WHERE id = ?", (self.title, self.author_id, self.magazine_id, self.id))
@@ -28,6 +28,7 @@ class Article:
             self.id = CURSOR.lastrowid
         CONN.commit()
 
+    #Find article by id
     @classmethod
     def find_by_id(cls, id):
         sql = """
@@ -37,6 +38,7 @@ class Article:
         row = CURSOR.fetchone()
         return cls(row["title"], row["author_id"], row["magazine_id"], row["id"]) if row else None
     
+    #Find article by title
     @classmethod
     def find_by_title(cls, title):
         sql = """
@@ -46,6 +48,7 @@ class Article:
         row = CURSOR.fetchone()
         return cls(row["title"], row["author_id"], row["magazine_id"], row["id"]) if row else None
     
+    #Find article by author
     @classmethod
     def find_by_author(cls, author_id):
         sql = """
@@ -54,7 +57,8 @@ class Article:
         CURSOR.execute(sql, (author_id,))
         rows = CURSOR.fetchall()
         return [cls(row["title"], row["author_id"], row["magazine_id"], row["id"]) for row in rows]
-       
+
+    #Find article by magazine  
     @classmethod
     def find_by_magazine(cls, magazine_id):
         sql = """
@@ -64,14 +68,17 @@ class Article:
         rows = CURSOR.fetchall()
         return [cls(row["title"], row["author_id"], row["magazine_id"], row["id"]) for row in rows]
     
+    #Return author for specific article
     def author(self):
         from lib.models.author import Author
         return Author.find_by_id(self.author_id)
 
+    #Retunr magazine associated with article
     def magazine(self):
         from lib.models.magazine import Magazine
         return Magazine.find_by_id(self.magazine_id)
     
+    #Create a new author and their associated articles
     @classmethod
     def create_author_with_articles(cls, author_name, articles_data):
         try:

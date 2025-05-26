@@ -29,7 +29,8 @@ class Magazine:
             self._category = category
         else:
             raise ValueError("Category must be a string")
-        
+
+    #Add instance to table   
     def save(self):
         if self.id:
             CURSOR.execute("UPDATE magazines SET name = ?, category = ? WHERE id = ?", (self.name, self.category, self.id))
@@ -38,6 +39,7 @@ class Magazine:
             self.id = CURSOR.lastrowid
         CONN.commit()
 
+    #Fin magazine by id
     @classmethod
     def find_by_id(cls, id):
         sql = """
@@ -47,6 +49,7 @@ class Magazine:
         row = CURSOR.fetchone()
         return cls(row["name"], row["category"], row["id"]) if row else None
     
+    #Find magazine by name
     @classmethod
     def find_by_name(cls, name):
         sql = """
@@ -56,6 +59,7 @@ class Magazine:
         row = CURSOR.fetchone()
         return cls(row["name"], row["category"], row["id"]) if row else None
     
+    #Find magazine by category
     @classmethod
     def find_by_category(cls, category):
         sql = """
@@ -65,6 +69,7 @@ class Magazine:
         rows = CURSOR.fetchall()
         return [cls(row["name"], row["category"], row["id"]) for row in rows]
     
+    #Find all magazines with more than 2 distinct authors
     @classmethod
     def magazine_with_multiple_authors(cls):
         sql = """
@@ -77,6 +82,7 @@ class Magazine:
         rows = CURSOR.fetchall()
         return [cls(row["name"], row["category"], row["id"]) for row in rows]
 
+    #Count articles in magazine
     @classmethod
     def article_count(cls):
         sql = """
@@ -88,6 +94,7 @@ class Magazine:
         CURSOR.execute(sql)
         return CURSOR.fetchall()
     
+    #Find author with most publishes
     @classmethod
     def top_publisher(cls):
         sql = """
@@ -102,16 +109,12 @@ class Magazine:
         row = CURSOR.fetchone()
         return cls(row["name"], row["category"], row["id"]) if row else None
 
+    #Find all articles in magazine
     def articles(self):
         from lib.models.article import Article
         return Article.find_by_magazine(self.id)
     
-    def authors(self):
-        from lib.models.article import Article
-        from lib.models.author import Author
-        articles = Article.find_by_magazine(self.id)
-        return list ({article.author() for article in articles})
-    
+    #Find all authors that contributed to magazine
     def contributors(self):
         from lib.models.author import Author
         sql = """
@@ -124,6 +127,7 @@ class Magazine:
         rows = CURSOR.fetchall()
         return [Author(row["name"], row["id"]) for row in rows]
     
+    #Find article titles in Magazine
     def article_titles(self):
         sql = """
             SELECT title FROM articles WHERE magazine_id = ?
@@ -132,6 +136,7 @@ class Magazine:
         rows = CURSOR.fetchall()
         return [row["title"] for row in rows]
 
+    #Find authors who have written more than 2 articles for this specific magazine
     def contributing_authors(self):
         from lib.models.author import Author
         sql = """
@@ -145,8 +150,3 @@ class Magazine:
         CURSOR.execute(sql, (self.id,))
         rows = CURSOR.fetchall()
         return [Author(row["name"], row["id"]) for row in rows]
-
-
-
-
-

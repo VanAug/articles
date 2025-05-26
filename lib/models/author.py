@@ -16,7 +16,8 @@ class Author:
             self._name = name
         else:
             raise ValueError("Author name must be a non empty string less tan 25 charactres.")
-        
+
+    #Add instance to table   
     def save(self):
         if self.id:
             CURSOR.execute("UPDATE authors SET name = ? WHERE id = ?", (self.name, self.id))
@@ -25,6 +26,7 @@ class Author:
             self.id = CURSOR.lastrowid
         CONN.commit()
 
+    #find author by id
     @classmethod
     def find_by_id(cls, id):
         sql = """
@@ -34,6 +36,7 @@ class Author:
         row = CURSOR.fetchone()
         return cls(row["name"], row["id"]) if row else None
     
+    #find author by name
     @classmethod
     def find_by_name(cls, name):
         sql = """
@@ -43,17 +46,7 @@ class Author:
         row = CURSOR.fetchone()
         return cls(row["name"], row["id"]) if row else None
     
-    @classmethod
-    def most_articles(cls):
-        CURSOR.execute("""
-            SELECT author_id, COUNT(*) as count FROM articles
-            GROUP BY author_id
-            ORDER BY count DESC
-            LIMIT 1
-        """)
-        row = CURSOR.fetchone()
-        return cls.find_by_id(row["author_id"]) if row else None
-    
+    #Find author with most articles    
     @classmethod
     def most_prolific(cls):
         sql = """
@@ -68,16 +61,19 @@ class Author:
         row = CURSOR.fetchone()
         return cls(row["name"], row["id"]) if row else None
     
+    #find all articles by author id
     def articles(self):
         from lib.models.article import Article
         return Article.find_by_author(self.id)
 
+    #find magazines contributed to by author.
     def magazines(self):
         from lib.models.magazine import Magazine
         articles = self.articles()
         magazine_ids = {article.magazine_id for article in articles}
         return [Magazine.find_by_id(mag_ids) for mag_ids in magazine_ids]
 
+    #Add new article by author 
     def add_article(self, magazine, title):
         from lib.models.article import Article
         if not self.id or not magazine.id:
@@ -86,6 +82,7 @@ class Author:
         article.save()
         return article
     
+    #Show topic areas by author
     def topic_areas(self):
         sql = """
             SELECT DISTINCT m.category
