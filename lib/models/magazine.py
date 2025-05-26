@@ -66,6 +66,7 @@ class Magazine:
             return [cls(row["name"], row["category"], row["id"]) for row in rows]
         
         def articles(self):
-            pass
+            from lib.models.article import Article
+            return Article.find_by_magazine(self.id)
 
 

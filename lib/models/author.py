@@ -1,6 +1,6 @@
 
 from lib.db.connection import CONN, CURSOR
-class Authors:
+class Author:
 
     def __init__(self, name, id = None):
         self.id = id
@@ -44,8 +44,11 @@ class Authors:
         return cls(row["name"], row["name"]) if row else None
     
     def articles(self):
-        pass
+        from lib.models.article import Article
+        return Article.find_by_author(self.id)
 
     def magazines(self):
-        pass
+        from lib.models.article import Article
+        articles = self.articles()
+        return list({article.magazine() for article in articles})
     
