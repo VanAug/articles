@@ -71,3 +71,19 @@ class Article:
     def magazine(self):
         from lib.models.magazine import Magazine
         return Magazine.find_by_id(self.magazine_id)
+    
+    @classmethod
+    def create_author_with_articles(cls, author_name, articles_data):
+        try:
+            with CONN:
+                CURSOR.execute("INSERT INTO authors (name) VALUES (?) RETURNING id", (author_name,))
+                author_id = CURSOR.fetchone()[0]
+                for article in articles_data:
+                    CURSOR.execute(
+                        "INSERT INTO articles (title, author_id, magazine_id) VALUES (?, ?, ?)",
+                        (article["title"], author_id, article["magazine_id"])
+                    )
+            return author_id
+        except Exception as e:
+            print(f"Transaction failed: {e}")
+            return None
