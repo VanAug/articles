@@ -87,6 +87,20 @@ class Magazine:
         """
         CURSOR.execute(sql)
         return CURSOR.fetchall()
+    
+    @classmethod
+    def top_publisher(cls):
+        sql = """
+            SELECT magazines.id, magazines.name, magazines.category, COUNT(articles.id) AS article_count
+            FROM magazines
+            JOIN articles ON magazines.id = articles.magazine_id
+            GROUP BY magazines.id
+            ORDER BY article_count DESC
+            LIMIT 1
+        """
+        CURSOR.execute(sql)
+        row = CURSOR.fetchone()
+        return cls(row["name"], row["category"], row["id"]) if row else None
 
     def articles(self):
         from lib.models.article import Article

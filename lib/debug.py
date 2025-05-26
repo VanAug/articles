@@ -41,6 +41,8 @@ def seed_data():
     Article("Mental Health Tips", a1.id, m2.id).save()
     Article("Policy Reform", a2.id, m3.id).save()
     Article("Gadget Reviews", a3.id, m1.id).save()
+    Article("Quantum Computing", a1.id, m1.id).save()
+    Article("VR Innovations", a1.id, m1.id).save()
 
 def test_author_methods():
     print("\n=== Testing Author Methods ===")
@@ -86,6 +88,14 @@ def test_magazine_methods():
     print("\nContributing authors (more than 2 articles):")
     for author in mag.contributing_authors():
         print(f"- {author.name}")
+
+    print("\nTop publisher magazine:")
+    top_mag = Magazine.top_publisher()
+    if top_mag:
+        articles_count = len(top_mag.articles())
+        print(f"- {top_mag.name} (Articles: {articles_count})")
+    else:
+        print("No magazines with articles found.")
 
 def test_class_lookup():
     print("\n=== Testing Class Lookup Methods ===")

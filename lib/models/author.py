@@ -73,8 +73,10 @@ class Author:
         return Article.find_by_author(self.id)
 
     def magazines(self):
+        from lib.models.magazine import Magazine
         articles = self.articles()
-        return list({article.magazine() for article in articles})
+        magazine_ids = {article.magazine_id for article in articles}
+        return [Magazine.find_by_id(mag_ids) for mag_ids in magazine_ids]
 
     def add_article(self, magazine, title):
         from lib.models.article import Article
