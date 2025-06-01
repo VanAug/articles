@@ -71,7 +71,7 @@ class Magazine:
     
     #Find all magazines with more than 2 distinct authors
     @classmethod
-    def magazine_with_multiple_authors(cls):
+    def with_multiple_authors(cls):
         sql = """
             SELECT m.* FROM magazines m
             JOIN articles a ON m.id = a.magazine_id
@@ -84,7 +84,7 @@ class Magazine:
 
     #Count articles in magazine
     @classmethod
-    def article_count(cls):
+    def article_counts(cls):
         sql = """
             SELECT m.name, COUNT(a.id) as article_count
             FROM magazines m
